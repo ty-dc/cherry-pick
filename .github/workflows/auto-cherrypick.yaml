@@ -110,7 +110,7 @@ jobs:
           git config  user.email "robot@example.com"
           git config  user.name "robot"
           git config --global commit.gpgsign true
-          git config --global user.signingkey {{ env.GITHUB_TOKEN }}
+          git config --global user.signingkey ${{ secrets.WELAN_PAT }}
           gh label create ${{ env.CHERRYPICK_LABEL }} || true
           for BRANCH in $WANT_MERGE_BRANCH_LIST ; do
               echo "************** cherry for branch ${BRANCH}"
