@@ -30,7 +30,6 @@ jobs:
         with:
           fetch-depth: 0
           ssh-key: ${{ secrets.WELAN_PAT }}
-          
 
       - name: cherry pick
         id: cherry-pick
