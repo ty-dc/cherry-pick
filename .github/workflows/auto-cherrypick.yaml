@@ -188,6 +188,7 @@ jobs:
                   git status
                   git branch --show-current
                   git show
+                  cat ../xyz.md
                   git push origin ${PR_BRANCH} -f
               else
                   echo "no changes happened for commits $PR_COMMITS, ignore create pr"
@@ -198,11 +199,10 @@ jobs:
               echo "$ERROR_MESSAGE" >> $GITHUB_ENV
               echo "EOF" >> $GITHUB_ENV
           done
-          git checkout -f $BRANCH
 
       - name: Create Pull Request
         id: create_pr
-        if: ${{ env.FAIL != 'true' && env.UPDATE == 'true' }}
+        if: ${{ env.FAIL != 'true' && env.UPDATE != 'true' }}
         uses: peter-evans/create-pull-request@v5.0.2
         with:
           title: ${{ env.PR_TITLE }}
