@@ -24,6 +24,7 @@ on:
 jobs:
   cherry_pick:
     runs-on: ubuntu-latest
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'cherrypick-release-v0.8') && github.event.pull_request.merged == true }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
