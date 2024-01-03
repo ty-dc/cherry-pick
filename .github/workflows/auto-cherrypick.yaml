@@ -189,12 +189,14 @@ jobs:
               fi
               if [ "$UPDATE" == "true" ] ; then
                   echo "succeeded to cherry pick to branch $BRANCH "
+                  echo "log info"
+                  git log
                   git push origin ${PR_BRANCH}:${PR_BRANCH} -f
               else
                   echo "no changes happened for commits $PR_COMMITS, ignore create pr"
               fi
           done
-          git checkout -f ${{ env.BRANCH }}
+          git checkout -f $BRANCH
 
       - name: Create Pull Request
         id: create_pr
