@@ -149,7 +149,6 @@ jobs:
               PR_BRANCH=robot/cherrypick/pr${PR_NUMBER}/${BRANCH}
               echo "PR_BRANCH=${PR_BRANCH}" >> $GITHUB_ENV
               echo "BRANCH=${BRANCH}" >> $GITHUB_ENV
-              git checkout -b ${PR_BRANCH}
               git branch --show-current
               FAIL=false
               UPDATE=false
