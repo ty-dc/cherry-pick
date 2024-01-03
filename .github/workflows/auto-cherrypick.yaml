@@ -28,6 +28,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          token: ${{ secrets.WELAN_PAT }}
           fetch-depth: 0
 
       - name: cherry pick
