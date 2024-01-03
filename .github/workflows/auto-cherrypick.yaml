@@ -28,8 +28,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-          ssh-key: ${{ secrets.WELAN_PAT }}
+            fetch-depth: 0
+      - run: |
+          git config  user.email "robot@example.com"
+          git config  user.name "robot"
+          git config --global credential.helper store
+          echo "gpg key"
+          gpg --list-secret-keys --keyid-format=long
+          echo "smimesign"
+          smimesign --list-keys
 
       - name: cherry pick
         env:
@@ -108,8 +115,6 @@ jobs:
           echo "============ begin to cherry pick ============ "
           FINAL_FAILURE=false
           git branch
-          git config  user.email "robot@example.com"
-          git config  user.name "robot"
           gh label create ${{ env.CHERRYPICK_LABEL }} || true
           for BRANCH in $WANT_MERGE_BRANCH_LIST ; do
               echo "************** cherry for branch ${BRANCH}"
