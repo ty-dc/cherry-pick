@@ -109,7 +109,6 @@ jobs:
           git branch
           git config  user.email "robot@example.com"
           git config  user.name "robot"
-          git config --global commit.gpgsign true
           gh label create ${{ env.CHERRYPICK_LABEL }} || true
           for BRANCH in $WANT_MERGE_BRANCH_LIST ; do
               echo "************** cherry for branch ${BRANCH}"
@@ -185,7 +184,7 @@ jobs:
               if [ "$UPDATE" == "true" ] ; then
                   echo "succeeded to cherry pick to branch $BRANCH "
                   # create a pr
-                  # git config --global user.signingkey ${{ secrets.WELAN_PAT }}
+                  echo ${{ secrets.WELAN_PAT }} | gh auth login --with-token
                   git commit -s --amend --no-edit
                   git push origin ${PR_BRANCH}:${PR_BRANCH} -f
                   gh pr create --title "${PR_TITLE}" \
