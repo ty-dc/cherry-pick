@@ -177,6 +177,8 @@ jobs:
                     else
                         UPDATE=true
                         echo "succeed to cherry pick $COMMIT to branch $BRANCH "
+                        git add .
+                        git commit -s --amend --no-edit
                     fi
               done
               echo "FAIL=${FAIL}" >> $GITHUB_ENV
@@ -197,7 +199,7 @@ jobs:
           delete-branch: false
           base: ${{ env.BRANCH }}
           signoff: true
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.WELAN_PAT }}
           labels: ${{ env.CHERRYPICK_LABEL }}
           body: "robot cherry pick PR < ${{ env.PR_URL }} > from ${{ env.PR_AUTHOR }},to branch ${{ env.BRANCH }},  action <${{ env.ACTION_URL }}>  , commits ${{ env.PR_COMMITS }}"
           reviewers: ${{ env.PR_AUTHOR }},${{ env.DEFAULT_REVIEWER }}
@@ -207,7 +209,7 @@ jobs:
         if: ${{ env.FAIL == 'true' && env.UPDATE != 'true' }}
         uses: dacbd/create-issue-action@v1.2.1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.WELAN_PAT }}
           title: "failed to cherry pick PR ${{ env.PR_NUMBER }} from ${{ env.PR_AUTHOR }}, to branch ${{ env.BRANCH }}"
           body: |
             commits ${{ env.PR_COMMITS }} of ${{ env.PR_AUTHOR }} conflict when merging to branch ${{ env.BRANCH }}.
