@@ -194,6 +194,7 @@ jobs:
                   echo "no changes happened for commits $PR_COMMITS, ignore create pr"
               fi
           done
+          git checkout -f ${{ env.BRANCH }}
 
       - name: Create Pull Request
         id: create_pr
