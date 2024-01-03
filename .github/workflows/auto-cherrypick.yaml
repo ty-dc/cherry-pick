@@ -188,7 +188,7 @@ jobs:
                   git status
                   git branch --show-current
                   git show
-                  cat ../xyz.md
+                  ls
                   git push origin ${PR_BRANCH} -f
               else
                   echo "no changes happened for commits $PR_COMMITS, ignore create pr"
