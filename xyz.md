@@ -19,3 +19,5 @@ cherry-pick -f
 cherry-pick -h
 
 cherry-pick -j
+
+cherry-pick -k
