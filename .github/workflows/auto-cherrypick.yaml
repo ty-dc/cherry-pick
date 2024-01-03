@@ -154,6 +154,7 @@ jobs:
               FAIL=false
               UPDATE=false
               ERROR_MESSAGE=""
+              echo "PR_COMMITS=PR_COMMITS"
               for COMMIT in $PR_COMMITS; do
                     if ! ERROR_MESSAGE=`git cherry-pick -m 1 $COMMIT 2>&1` ; then
                           echo ">>>>>>>>>>>> fail when cherry pick $COMMIT to branch $BRANCH "
@@ -174,9 +175,6 @@ jobs:
                               git reset --hard HEAD || true
                               break
                           fi
-                          echo "ERROR_MESSAGE<<EOF" >> $GITHUB_ENV
-                          echo "$ERROR_MESSAGE" >> $GITHUB_ENV
-                          echo "EOF" >> $GITHUB_ENV
                     else
                         UPDATE=true
                         echo "succeed to cherry pick $COMMIT to branch $BRANCH "
@@ -187,12 +185,17 @@ jobs:
               fi
               if [ "$UPDATE" == "true" ] ; then
                   echo "succeeded to cherry pick to branch $BRANCH "
+                  git add .
+                  git commit -s --amend --no-edit 
                   git push origin ${PR_BRANCH}:${PR_BRANCH} -f
               else
                   echo "no changes happened for commits $PR_COMMITS, ignore create pr"
               fi
               echo "FAIL=${FAIL}" >> $GITHUB_ENV
               echo "UPDATE=${UPDATE}" >> $GITHUB_ENV
+              echo "ERROR_MESSAGE<<EOF" >> $GITHUB_ENV
+              echo "$ERROR_MESSAGE" >> $GITHUB_ENV
+              echo "EOF" >> $GITHUB_ENV
           done
           git checkout -f $BRANCH
 
@@ -220,10 +223,11 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           title: "failed to cherry pick PR ${{ env.PR_NUMBER }} from ${{ env.PR_AUTHOR }}, to branch ${{ env.BRANCH }}"
           body: |
-            commits ${{ env.PR_COMMITS }} of ${{ env.PR_AUTHOR }} conflict when merging to branch ${{ env.BRANCH }}
+            commits ${{ env.PR_COMMITS }} of ${{ env.PR_AUTHOR }} conflict when merging to branch ${{ env.BRANCH }}.
             please manually cherry pick it by yourself. 
-            PR <${{ env.PR_URL }}> , action <${{ env.ACTION_URL }}> 
-            error log <${{ env.ERROR_MESSAGE }}>
+            PR <${{ env.PR_URL }}> , action <${{ env.ACTION_URL }}> .
+            error log:
+            <${{ env.ERROR_MESSAGE }}>
           labels: ${{ env.CHERRYPICK_LABEL }}
           assignees: ${{ env.PR_AUTHOR }},${{ env.DEFAULT_REVIEWER }}
 
