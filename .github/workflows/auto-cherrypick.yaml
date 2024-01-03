@@ -180,19 +180,6 @@ jobs:
                         echo "succeed to cherry pick $COMMIT to branch $BRANCH "
                     fi
               done
-              if [ "$FAIL" == "true" ] ; then
-                  echo "failed to cherry pick to branch $BRANCH "
-              fi
-              if [ "$UPDATE" == "true" ] ; then
-                  echo "succeeded to cherry pick to branch $BRANCH "
-                  git status
-                  git branch --show-current
-                  git show
-                  ls
-                  git push origin ${PR_BRANCH} -f
-              else
-                  echo "no changes happened for commits $PR_COMMITS, ignore create pr"
-              fi
               echo "FAIL=${FAIL}" >> $GITHUB_ENV
               echo "UPDATE=${UPDATE}" >> $GITHUB_ENV
               echo "ERROR_MESSAGE<<EOF" >> $GITHUB_ENV
