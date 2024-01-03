@@ -189,7 +189,7 @@ jobs:
 
       - name: Create Pull Request
         id: create_pr
-        if: ${{ env.FAIL != 'true' && env.UPDATE != 'true' }}
+        if: ${{ env.FAIL != 'true' && env.UPDATE == 'true' }}
         uses: peter-evans/create-pull-request@v5.0.2
         with:
           title: ${{ env.PR_TITLE }}
