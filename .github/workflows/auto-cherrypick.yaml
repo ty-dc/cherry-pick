@@ -185,9 +185,10 @@ jobs:
               fi
               if [ "$UPDATE" == "true" ] ; then
                   echo "succeeded to cherry pick to branch $BRANCH "
-                  git add .
-                  git commit -s --amend --no-edit 
-                  git push origin ${PR_BRANCH}:${PR_BRANCH} -f
+                  git status
+                  git branch --show-current
+                  git show
+                  git push origin ${PR_BRANCH} -f
               else
                   echo "no changes happened for commits $PR_COMMITS, ignore create pr"
               fi
