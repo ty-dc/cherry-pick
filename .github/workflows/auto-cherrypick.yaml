@@ -184,7 +184,7 @@ jobs:
               if [ "$UPDATE" == "true" ] ; then
                   echo "succeeded to cherry pick to branch $BRANCH "
                   # create a pr
-                  echo ${{ secrets.WELAN_PAT }} | gh auth login --with-token
+                  echo ${{ env.GITHUB_TOKEN }} | gh auth login --with-token
                   git commit -s --amend --no-edit
                   git push origin ${PR_BRANCH}:${PR_BRANCH} -f
                   gh pr create --title "${PR_TITLE}" \
