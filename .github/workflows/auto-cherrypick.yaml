@@ -203,13 +203,13 @@ jobs:
           title: ${{ env.PR_TITLE }}
           commit-message: ${{ env.PR_COMMITS }}
           branch: ${{ env.PR_BRANCH }}
-          delete-branch: true
+          delete-branch: false
           base: ${{ env.BRANCH }}
           signoff: true
           token: ${{ secrets.GITHUB_TOKEN }}
           labels: ${{ env.CHERRYPICK_LABEL }}
           body: "robot cherry pick PR < ${{ env.PR_URL }} > from ${{ env.PR_AUTHOR }},to branch ${{ env.BRANCH }},  action <${{ env.ACTION_URL }}>  , commits ${{ env.PR_COMMITS }}"
-          reviewers: ${PR_AUTHOR},${{ env.DEFAULT_REVIEWER }}
+          reviewers: ${{ env.PR_AUTHOR }},${{ env.DEFAULT_REVIEWER }}
 
       - name: Creat Issue
         id: create_issue
@@ -221,7 +221,7 @@ jobs:
           body: |
             "commits ${{ env.PR_COMMITS }} of ${{ env.PR_AUTHOR }} conflict when merging to branch ${{ env.BRANCH }}, please manually cherry pick it by yourself. \n PR <${{ env.PR_URL }}> ,  action <${{ env.ACTION_URL }}>  \n\n  \`\`\`\n ${{ steps.cherry-pick.outputs.ERROR_MESSAGE }}\n\`\`\` "
           labels: ${{ env.CHERRYPICK_LABEL }}
-          assignees: ${PR_AUTHOR},${{ env.DEFAULT_REVIEWER }}
+          assignees: ${{ env.PR_AUTHOR }},${{ env.DEFAULT_REVIEWER }}
 
       - name: check result
         if: ${{ steps.create_pr.result == 'failure' || steps.create_issue.result == 'failure' }}
