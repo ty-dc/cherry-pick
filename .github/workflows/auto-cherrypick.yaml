@@ -113,12 +113,14 @@ jobs:
           #
           echo "============ begin to cherry pick ============ "
           FINAL_FAILURE=false
+          git branch
+          git config  user.email "robot@example.com"
+          git config  user.name "robot"
           git config --list
           git config --global commit.gpgsign true
           git config --global gpg.format ssh
           git config --global credential.helper store
           git config --list
-          git branch
           gh label create ${{ env.CHERRYPICK_LABEL }} || true
           for BRANCH in $WANT_MERGE_BRANCH_LIST ; do
               echo "************** cherry for branch ${BRANCH}"
