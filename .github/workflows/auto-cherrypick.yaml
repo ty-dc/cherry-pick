@@ -12,6 +12,11 @@ on:
     branches:
       - 'release-*'
       - 'main'
+  pull_request:
+    branches:
+      - main
+      - 'release-*'
+    types: ["closed"]
   workflow_dispatch:
     inputs:
       prNumber:
@@ -24,7 +29,7 @@ on:
 jobs:
   cherry_pick:
     runs-on: ubuntu-latest
-    if: ${{ contains(github.event.pull_request.labels.*.name, 'cherrypick-release-v0.8') && github.event.pull_request.merged == true }}
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'release-v0.8') && github.event.pull_request.merged == true }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
