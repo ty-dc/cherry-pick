@@ -30,8 +30,6 @@ jobs:
         with:
             fetch-depth: 0
       - run: |
-          git config  user.email "robot@example.com"
-          git config  user.name "robot"
           git config --global credential.helper store
           git pull
           echo "gpg key"
