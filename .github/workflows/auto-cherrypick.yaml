@@ -181,9 +181,9 @@ jobs:
               done
               echo "FAIL=${FAIL}" >> $GITHUB_ENV
               echo "UPDATE=${UPDATE}" >> $GITHUB_ENV
-              echo "ERROR_MESSAGE<<$EOF" >> $GITHUB_OUTPUT
+              echo "ERROR_MESSAGE<<EOF" >> $GITHUB_OUTPUT
               echo "$ERROR_MESSAGE" >> $GITHUB_OUTPUT
-              echo "$EOF" >> $GITHUB_OUTPUT
+              echo "EOF" >> $GITHUB_OUTPUT
           done
 
       - name: Create Pull Request
