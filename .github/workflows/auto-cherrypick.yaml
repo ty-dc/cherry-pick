@@ -33,10 +33,9 @@ jobs:
           git config  user.email "robot@example.com"
           git config  user.name "robot"
           git config --global credential.helper store
+          git pull
           echo "gpg key"
           gpg --list-secret-keys --keyid-format=long
-          echo "smimesign"
-          smimesign --list-keys
 
       - name: cherry pick
         env:
