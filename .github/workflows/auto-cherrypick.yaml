@@ -113,9 +113,12 @@ jobs:
           #
           echo "============ begin to cherry pick ============ "
           FINAL_FAILURE=false
+          git config --list
+          git config --global commit.gpgsign true
+          git config --global gpg.format ssh
+          git config --global credential.helper store
+          git config --list
           git branch
-          git config  user.email "robot@example.com"
-          git config  user.name "robot"
           gh label create ${{ env.CHERRYPICK_LABEL }} || true
           for BRANCH in $WANT_MERGE_BRANCH_LIST ; do
               echo "************** cherry for branch ${BRANCH}"
@@ -134,6 +137,7 @@ jobs:
                   continue
               fi
               git fetch origin ${BRANCH}:${BRANCH} || true
+              git pull origin ${BRANCH}:${BRANCH} || true
               if ! git checkout ${BRANCH} ; then
                   echo "error, failed to checkout to branch $BRANCH"
                   gh issue create  \
