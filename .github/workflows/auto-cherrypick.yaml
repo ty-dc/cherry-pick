@@ -29,6 +29,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ssh-key: ${{ secrets.WELAN_PAT }}
 
       - name: cherry pick
         env:
@@ -184,7 +185,6 @@ jobs:
               if [ "$UPDATE" == "true" ] ; then
                   echo "succeeded to cherry pick to branch $BRANCH "
                   # create a pr
-                  echo ${{ env.GITHUB_TOKEN }} | gh auth login --with-token
                   git commit -s --amend --no-edit
                   git push origin ${PR_BRANCH}:${PR_BRANCH} -f
                   gh pr create --title "${PR_TITLE}" \
