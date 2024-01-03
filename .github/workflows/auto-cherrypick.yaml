@@ -12,11 +12,6 @@ on:
     branches:
       - 'release-*'
       - 'main'
-  pull_request:
-    branches:
-      - main
-      - 'release-*'
-    types: ["closed"]
   workflow_dispatch:
     inputs:
       prNumber:
@@ -29,14 +24,13 @@ on:
 jobs:
   cherry_pick:
     runs-on: ubuntu-latest
-    if: ${{ contains(github.event.pull_request.labels.*.name, 'release-v0.8') && github.event.pull_request.merged == true }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-            fetch-depth: 0
+          fetch-depth: 0
 
-      - name: get label and pr number
+      - name: cherry pick
         env:
           GITHUB_TOKEN: ${{ secrets.WELAN_PAT }}
           JSON: ${{ toJSON(github) }}
@@ -91,13 +85,13 @@ jobs:
           echo "url: ${PR_URL}"
           echo "PR_LABEL: ${PR_LABEL}"
           echo "PR_TITLE: ${PR_TITLE}"
-          echo "PR_AUTHOR=${PR_AUTHOR}" >> $GITHUB_ENV
-          echo "PR_LABEL=${PR_LABEL}" >> $GITHUB_ENV
-          echo "PR_LABEL=${PR_LABEL}" >> $GITHUB_ENV
           echo "PR_TITLE=${PR_TITLE}" >> $GITHUB_ENV
+          echo "PR_LABEL=${PR_LABEL}" >> $GITHUB_ENV
           echo "PR_URL=${PR_URL}" >> $GITHUB_ENV
-          #
-          #
+          echo "PR_COMMITS=${PR_COMMITS}" >> $GITHUB_ENV
+          echo "PR_AUTHOR=${PR_AUTHOR}" >> $GITHUB_ENV
+          echo "ACTION_URL=${ACTION_URL}" >> $GITHUB_ENV
+          echo "PR_NUMBER=${PR_NUMBER}" >> $GITHUB_ENV
           echo "=============================== get dest branch from labels ======== "
           WANT_MERGE_BRANCH_LIST=""
           if ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.destBranch != '' }}; then
@@ -113,12 +107,113 @@ jobs:
           fi
           [ -z "$WANT_MERGE_BRANCH_LIST" ] && echo "no branch to cherry pick" && exit 0
           echo "cherry pick to $WANT_MERGE_BRANCH_LIST "
+          #
+          #
+          echo "============ begin to cherry pick ============ "
+          FINAL_FAILURE=false
+          git branch
+          git config  user.email "robot@example.com"
+          git config  user.name "robot"
+          gh label create ${{ env.CHERRYPICK_LABEL }} || true
+          for BRANCH in $WANT_MERGE_BRANCH_LIST ; do
+              echo "************** cherry for branch ${BRANCH}"
+              if ! git ls-remote --exit-code --heads origin ${BRANCH} ; then
+                  # todo: create issue
+                  echo "error, branch $BRANCH does not exist"
+                  gh issue create  \
+                      --body "reason: the branch $BRANCH does not exist. PR <${PR_URL}> ,  action <${ACTION_URL}> " \
+                      --title "failed to auto cherry pick PR ${PR_NUMBER} to branch ${BRANCH}" \
+                      --label "${{ env.CHERRYPICK_LABEL }}" \
+                      --assignee "${PR_AUTHOR},${{ env.DEFAULT_REVIEWER }}"
+                  if (($?!=0)) ; then
+                      echo "!!!! error, failed to create issue"
+                      FINAL_FAILURE=true
+                  fi
+                  continue
+              fi
+              git fetch origin ${BRANCH}:${BRANCH} || true
+              if ! git checkout ${BRANCH} ; then
+                  echo "error, failed to checkout to branch $BRANCH"
+                  gh issue create  \
+                      --body "reason: failed to get the branch $BRANCH. PR <${PR_URL}> ,  action <${ACTION_URL}> " \
+                      --title "failed to auto cherry pick PR ${PR_NUMBER} to branch ${BRANCH}" \
+                      --label "${{ env.CHERRYPICK_LABEL }}" \
+                      --assignee "${PR_AUTHOR},${{ env.DEFAULT_REVIEWER }}"
+                  if (($?!=0)) ; then
+                      echo "!!!! error, failed to create issue"
+                      FINAL_FAILURE=true
+                  fi
+                  continue
+              fi
+              PR_BRANCH=robot/cherrypick/pr${PR_NUMBER}/${BRANCH}
+              echo "PR_BRANCH=${PR_BRANCH}" >> $GITHUB_ENV
+              echo "BRANCH=${BRANCH}" >> $GITHUB_ENV
+              git checkout -b ${PR_BRANCH}
+              git branch --show-current
+              FAIL=false
+              UPDATE=false
+              ERROR_MESSAGE=""
+              for COMMIT in $PR_COMMITS; do
+                    if ! ERROR_MESSAGE=`git cherry-pick -m 1 $COMMIT 2>&1` ; then
+                          echo ">>>>>>>>>>>> fail when cherry pick $COMMIT to branch $BRANCH "
+                          echo "$ERROR_MESSAGE"
+                          echo "---- failuire detail"
+                          git status
+                          git diff
+                          echo "<<<<<<<<<<<<<"
+                          if git diff --exit-code --quiet ; then
+                              echo "no changes happen, ignore cherry pick $COMMIT "
+                              git cherry-pick --abort || true
+                              git reset --hard HEAD || true
+                              continue
+                          else
+                              FAIL=true
+                              echo "error, failed to cherry pick $COMMIT "
+                              git cherry-pick --abort || true
+                              git reset --hard HEAD || true
+                              break
+                          fi
+                    else
+                        UPDATE=true
+                        echo "succeed to cherry pick $COMMIT to branch $BRANCH "
+                    fi
+              done
+              echo "FAIL=${FAIL}" >> $GITHUB_ENV
+              echo "UPDATE=${UPDATE}" >> $GITHUB_ENV
+              echo "ERROR_MESSAGE=${ERROR_MESSAGE}" >> $GITHUB_ENV
+          done
 
-      - name: Cherry pick
-        uses: carloscastrojumo/github-cherry-pick-action@v1.0.9
+      - name: Create Pull Request
+        id: create_pr
+        if: ${{ env.FAIL != 'true' && env.UPDATE == 'true' }}
+        uses: peter-evans/create-pull-request@v5.0.2
         with:
-          branch: release-v0.8
-          labels: |
-            ${{ env.PR_LABEL }}
-          reviewers: |
-            ${PR_AUTHOR},${{ env.DEFAULT_REVIEWER }}
+          title: ${{ env.PR_TITLE }}
+          commit-message: ${{ env.PR_COMMITS }}
+          branch: ${{ env.PR_BRANCH }}
+          delete-branch: true
+          base: ${{ env.BRANCH }}
+          signoff: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          labels: ${{ env.CHERRYPICK_LABEL }}
+          body: "robot cherry pick PR < ${{ env.PR_URL }} > from ${{ env.PR_AUTHOR }},to branch ${{ env.BRANCH }},  action <${{ env.ACTION_URL }}>  , commits ${{ env.PR_COMMITS }}"
+          reviewers: ${PR_AUTHOR},${{ env.DEFAULT_REVIEWER }}
+
+      - name: Creat Issue
+        id: create_issue
+        if: ${{ env.FAIL == 'true' && env.UPDATE != 'true' }}
+        uses: dacbd/create-issue-action@v1.2.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: "failed to cherry pick PR ${{ env.PR_NUMBER }} from ${{ env.PR_AUTHOR }}, to branch ${{ env.BRANCH }}"
+          body: |
+            "commits ${{ env.PR_COMMITS }} of ${{ env.PR_AUTHOR }} conflict when merging to branch ${{ env.BRANCH }}, please manually cherry pick it by yourself. \n PR <${{ env.PR_URL }}> ,  action <${{ env.ACTION_URL }}>  \n\n  \`\`\`\n ${{ env.ERROR_MESSAGE }}\n\`\`\` "
+          labels: ${{ env.CHERRYPICK_LABEL }}
+          assignees: ${PR_AUTHOR},${{ env.DEFAULT_REVIEWER }}
+
+      - name: check result
+        if: ${{ steps.create_pr.result == 'failure' || steps.create_issue.result == 'failure' }}
+        run: |
+              # if failed to create issue or pr, fails
+              echo "error, failuire happened"
+              exit 1
