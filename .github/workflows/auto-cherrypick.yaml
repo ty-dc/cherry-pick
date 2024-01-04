@@ -179,8 +179,6 @@ jobs:
                     else
                         UPDATE=true
                         echo "succeed to cherry pick $COMMIT to branch $BRANCH "
-                        git add .
-                        git commit -s --amend --no-edit
                     fi
               done
               echo "FAIL=${FAIL}" >> $GITHUB_ENV
