@@ -204,7 +204,7 @@ jobs:
           commit-message: ${{ env.PR_COMMITS }}
           committer: ty-dc <tao.yang@daocloud.io>
           branch: ${{ env.PR_BRANCH }}
-          author: ty-dc
+          author: ty-dc <tao.yang@daocloud.io>
           delete-branch: false
           base: ${{ env.BRANCH }}
           signoff: true
