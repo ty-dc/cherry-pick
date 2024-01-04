@@ -193,7 +193,7 @@ jobs:
         with:
           app_id: ${{ secrets.APP_ID }}
           private_key: ${{ secrets.APP_PRIVATE_KEY }}
-      - run: "echo 'The created token is masked: ${{ steps.create_token.outputs.token }}'"
+      - run: "echo 'The created token is masked: ${{ steps.generate-token.outputs.token }}'"
 
       - name: Create Pull Request
         id: create_pr
