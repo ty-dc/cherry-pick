@@ -194,11 +194,6 @@ jobs:
           app_id: ${{ secrets.APP_ID }}
           private_key: ${{ secrets.APP_PRIVATE_KEY }}
 
-      - name: Sign commit and push changes
-        run: |
-          git add .
-          git commit -s -S --amend --no-edit
-
       - name: Create Pull Request
         id: create_pr
         if: ${{ env.FAIL != 'true' && env.UPDATE == 'true' }}
