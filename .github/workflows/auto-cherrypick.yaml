@@ -1,6 +1,9 @@
 name: Auto CherryPick PR
 
-permissions: write-all
+permissions: 
+  pull-requests: write
+  issues: write
+  repository-projects: write
 
 env:
   PR_LABEL_PREFIX_CHERRYPICK: "cherrypick-"
