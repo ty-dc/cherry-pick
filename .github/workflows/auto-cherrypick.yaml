@@ -195,11 +195,6 @@ jobs:
           git_user_signingkey: true
           git_commit_gpgsign: true
 
-      - name: Sign commit and push changes
-        run: |
-          git add .
-          git commit -s -S --amend --no-edit
-
       - name: Create Pull Request
         id: create_pr
         if: ${{ env.FAIL != 'true' && env.UPDATE == 'true' }}
