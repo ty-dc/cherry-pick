@@ -53,7 +53,7 @@ jobs:
           branch: robot-test
           delete-branch: false
           base: release-v0.9
-          token: ${{ steps.generate_token.outputs.token }}
+          token: ${{ secrets.WELAN_PAT }}
           labels: ${{ env.CHERRYPICK_LABEL }}
           body: "this is test"
           reviewers: ty-dc
