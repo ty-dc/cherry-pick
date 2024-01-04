@@ -58,7 +58,7 @@ jobs:
           signoff: true
           token: ${{ steps.generate_token.outputs.token }}
           labels: ${{ env.CHERRYPICK_LABEL }}
-          body: "this is test xxxxx"
+          body: "this is test xxxxxxxxxxx"
           reviewers: ty-dc
 
       - name: Creat Issue
