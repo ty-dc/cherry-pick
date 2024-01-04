@@ -52,7 +52,7 @@ jobs:
           commit-message: test
           branch: robot-test
           delete-branch: false
-          base: release-v0.9
+          base: release-v0.8
           token: ${{ steps.generate_token.outputs.token }}
           labels: ${{ env.CHERRYPICK_LABEL }}
           body: "this is test"
