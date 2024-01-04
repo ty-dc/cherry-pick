@@ -53,6 +53,8 @@ jobs:
           branch: robot-test
           delete-branch: false
           base: release-v0.8
+          committer: ty-dc <tao.yang@daocloud.io>
+          author: ty-dc <tao.yang@daocloud.io>
           signoff: true
           token: ${{ steps.generate_token.outputs.token }}
           labels: ${{ env.CHERRYPICK_LABEL }}
