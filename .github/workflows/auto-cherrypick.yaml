@@ -204,9 +204,11 @@ jobs:
           commit-message: ${{ env.PR_COMMITS }}
           committer: ty-dc <tao.yang@daocloud.io>
           branch: ${{ env.PR_BRANCH }}
+          author: ty-dc
           delete-branch: false
           base: ${{ env.BRANCH }}
           signoff: true
+          token: ${{ secrets.WELAN_PAT }}
           labels: ${{ env.CHERRYPICK_LABEL }}
           body: "robot cherry pick PR <${{ env.PR_URL }}> from <${{ env.PR_AUTHOR }}>,to branch <${{ env.BRANCH }}>,  action <${{ env.ACTION_URL }}>  , commits ${{ env.PR_COMMITS }}"
           reviewers: ${{ env.PR_AUTHOR }},${{ env.DEFAULT_REVIEWER }}
