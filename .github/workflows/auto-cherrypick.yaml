@@ -36,7 +36,7 @@ jobs:
       - name: echo
         id: echo
         run: |
-          echo 12345 > robot.txt
+          echo 123456 > robot.txt
 
       - uses: actions/create-github-app-token@v1
         id: generate_token
@@ -53,7 +53,7 @@ jobs:
           branch: robot-test
           delete-branch: false
           base: release-v0.9
-          token: ${{ secrets.WELAN_PAT }}
+          token: ${{ steps.generate_token.outputs.token }}
           labels: ${{ env.CHERRYPICK_LABEL }}
           body: "this is test"
           reviewers: ty-dc
