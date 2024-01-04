@@ -53,6 +53,7 @@ jobs:
           branch: robot-test
           delete-branch: false
           base: release-v0.8
+          signoff: true
           token: ${{ steps.generate_token.outputs.token }}
           labels: ${{ env.CHERRYPICK_LABEL }}
           body: "this is test"
