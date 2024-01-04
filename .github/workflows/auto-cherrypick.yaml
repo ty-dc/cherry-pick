@@ -188,12 +188,16 @@ jobs:
               echo "EOF" >> $GITHUB_ENV
           done
 
-      - uses: crazy-max/ghaction-import-gpg@v5
+      - uses: tibdex/github-app-token@v1
+        id: generate-token
         with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.GPG_PASSPHRASE }}
-          git_user_signingkey: true
-          git_commit_gpgsign: true
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Sign commit and push changes
+        run: |
+          git add .
+          git commit -s -S --amend --no-edit
 
       - name: Create Pull Request
         id: create_pr
@@ -207,7 +211,7 @@ jobs:
           author: ty-dc <tao.yang@daocloud.io>
           delete-branch: false
           base: ${{ env.BRANCH }}
-          token: ${{ secrets.WELAN_PAT }}
+          token: ${{ steps.generate-token.outputs.token }}
           labels: ${{ env.CHERRYPICK_LABEL }}
           body: "robot cherry pick PR <${{ env.PR_URL }}> from <${{ env.PR_AUTHOR }}>,to branch <${{ env.BRANCH }}>,  action <${{ env.ACTION_URL }}>  , commits ${{ env.PR_COMMITS }}"
           reviewers: ${{ env.PR_AUTHOR }},${{ env.DEFAULT_REVIEWER }}
