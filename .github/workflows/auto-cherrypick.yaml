@@ -152,6 +152,7 @@ jobs:
                   continue
               fi
               PR_BRANCH=robot/cherrypick/pr${PR_NUMBER}/${BRANCH}
+              git checkout -b ${PR_BRANCH}
               echo "PR_BRANCH=${PR_BRANCH}" >> $GITHUB_ENV
               echo "BRANCH=${BRANCH}" >> $GITHUB_ENV
               git branch --show-current
@@ -192,11 +193,21 @@ jobs:
           done
 
       - uses: actions/create-github-app-token@v1
-        id: generate-token
+        id: generate_token
         with:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
-      - run: "echo 'The created token is masked: ${{ steps.generate-token.outputs.token }}'"
+
+      - name: Use the token
+        env:
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}
+        run: |
+            git push origin ${PR_BRANCH}:${PR_BRANCH} -f
+            gh pr create --title "${{ env.PR_TITLE }}" \
+                --assignee "${{ env.PR_AUTHOR }},${{ env.DEFAULT_REVIEWER }}" \
+                --label ${{ env.CHERRYPICK_LABEL }} \
+                --body "test---xxxx" \
+                --base ${{ env.BRANCH }}
 
       - name: Create Pull Request
         id: create_pr
