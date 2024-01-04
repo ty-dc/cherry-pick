@@ -198,7 +198,7 @@ jobs:
       - name: Sign commit and push changes
         run: |
           git add .
-          git commit -s -S --amend
+          git commit -s -S --amend --no-edit
 
       - name: Create Pull Request
         id: create_pr
