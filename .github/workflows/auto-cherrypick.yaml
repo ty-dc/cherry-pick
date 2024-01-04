@@ -203,6 +203,7 @@ jobs:
           GH_TOKEN: ${{ steps.generate_token.outputs.token }}
         run: |
             git push origin ${PR_BRANCH}:${PR_BRANCH} -f
+            gh auth login --with-token ${{ env.GH_TOKEN }}
             gh pr create --title "${{ env.PR_TITLE }}" \
                 --assignee "${{ env.PR_AUTHOR }},${{ env.DEFAULT_REVIEWER }}" \
                 --label ${{ env.CHERRYPICK_LABEL }} \
