@@ -195,14 +195,10 @@ jobs:
           git_user_signingkey: true
           git_commit_gpgsign: true
 
-      - name: check result
+      - name: Sign commit and push changes
         run: |
-              # if failed to create issue or pr, fails
-              git config --global --unset gpg.format
-              git config --global commit.gpgsign true
-              gpg --list-secret-keys --keyid-format=long
-              git add .
-              git commit -s -S --amend --no-edit
+          git add .
+          git commit -s -S -m "test"
 
       - name: Create Pull Request
         id: create_pr
