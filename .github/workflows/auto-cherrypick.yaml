@@ -36,7 +36,7 @@ jobs:
       - name: echo
         id: echo
         run: |
-          echo 123 > robot.txt
+          echo 12345 > robot.txt
 
       - uses: actions/create-github-app-token@v1
         id: generate_token
