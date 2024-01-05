@@ -205,10 +205,9 @@ jobs:
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
       
       - name: echo
-        with:
-          run: |
-            git add .
-            git commit -s -S --amend --no-edit
+        run: |
+          git add .
+          git commit -s -S --amend --no-edit
 
       - name: Create Pull Request
         id: create_pr
