@@ -231,7 +231,7 @@ jobs:
         if: ${{ env.FAIL == 'true' && env.UPDATE != 'true' }}
         uses: dacbd/create-issue-action@v1.2.1
         with:
-          token: ${{ steps.generate_token.outputs.token }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           title: "failed to cherry pick PR ${{ env.PR_NUMBER }} from ${{ env.PR_AUTHOR }}, to branch ${{ env.BRANCH }}"
           body: |
             commits ${{ env.PR_COMMITS }} of ${{ env.PR_AUTHOR }} conflict when merging to branch ${{ env.BRANCH }}.
